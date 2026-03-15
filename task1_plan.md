@@ -113,7 +113,7 @@ Applied **only to the training set** — never to validation or test.
 train_transforms = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.RandomHorizontalFlip(p=0.5),
-    transforms.RandomRotation(degrees=15),
+    transforms.RandomRotation(degrees=180),
     transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.2),
     transforms.RandomGrayscale(p=0.05),
     transforms.ToTensor(),
@@ -134,7 +134,7 @@ val_test_transforms = transforms.Compose([
 | Augmentation | Justification |
 |-------------|---------------|
 | Random horizontal flip | Rims are rotationally symmetric — a flipped rim is still the same class |
-| Random rotation (±15°) | Reflects real-world variation in rim orientation in the storage area |
+| Random rotation (±180°) | Rims are circular and can appear at any angle in factory storage — full rotation range reflects this |
 | Colour jitter | Reflects variation in lighting conditions in the factory environment |
 | Random grayscale | Encourages model to learn shape/texture rather than colour |
 
@@ -168,6 +168,11 @@ model.fc = nn.Sequential(
     nn.Dropout(p=0.4),
     nn.Linear(num_features, 10)
 )
+
+# Phase 2 — unfreeze only layer4 + FC (not all layers)
+def unfreeze_phase2(model):
+    for name, param in model.named_parameters():
+        param.requires_grad = 'layer4' in name or 'fc' in name
 ```
 
 **Training strategy (two-phase fine-tuning):**
@@ -175,7 +180,9 @@ model.fc = nn.Sequential(
 | Phase | Layers unfrozen | Epochs | Learning rate | Purpose |
 |-------|----------------|--------|---------------|---------|
 | Phase 1 | Final FC layer only | 5 | 1e-3 | Warm up the new head |
-| Phase 2 | All layers | 15–20 | 1e-4 | Fine-tune full network |
+| Phase 2 | layer4 + FC only | 15–20 | 1e-4 | Fine-tune task-relevant layers only |
+
+> **Why not unfreeze all layers:** With only 100 training images, fully unfreezing all 11M parameters risks overwriting the pretrained low-level features (edges, textures) learned on ImageNet. Unfreezing only `layer4` (the last residual block, ~3M parameters) + FC keeps the generic early-layer features intact while adapting the high-level features to rim classification.
 
 ### Comparison model: EfficientNetB0
 
@@ -203,8 +210,11 @@ criterion = nn.CrossEntropyLoss()
 # Phase 1 — head only
 optimizer_phase1 = optim.Adam(model.fc.parameters(), lr=1e-3)
 
-# Phase 2 — full network
-optimizer_phase2 = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
+# Phase 2 — layer4 + FC only
+optimizer_phase2 = optim.Adam(
+    filter(lambda p: p.requires_grad, model.parameters()),
+    lr=1e-4, weight_decay=1e-4
+)
 
 # Learning rate scheduler (robustness technique — mention in report)
 scheduler = CosineAnnealingLR(optimizer_phase2, T_max=20, eta_min=1e-6)

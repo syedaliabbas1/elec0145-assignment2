@@ -21,18 +21,18 @@
 
 | Class ID | Label | Rim Style | Why chosen |
 |----------|-------|-----------|------------|
-| 01 | BMW_M3_2023 | 5-double-spoke | Iconic, highly distinctive |
-| 02 | Porsche_911_2024 | Centre-lock turbine | Very different from others |
-| 03 | Mercedes_AMG_C63_2023 | Multi-spoke cross | Aggressive multi-spoke pattern |
+| 01 | BMW_M3_2023 | Star-spoke geometric | Complex web pattern, highly distinctive |
+| 02 | Porsche_911_2024 | 5-spoke classic | Thick blade-like spokes, iconic Porsche design |
+| 03 | Mercedes_AMG_C63_2023 | Multi-spoke cross | Dense cross-spoke forged pattern |
 | 04 | Audi_RS6_2023 | 5-V-spoke | Bold V shape |
-| 05 | Ferrari_SF90_2022 | Mesh / diamond-cut | Fine mesh, unique texture |
+| 05 | Ferrari_SF90_2022 | 5-spoke sculpted | Large angular 5-spoke with two-tone finish |
 | 06 | Mercedes_Maybach_S580_2022 | 5-spoke luxury | Polished multi-spoke, wide design |
 | 07 | Lamborghini_Urus_2022 | Y-spoke | Aggressive Y pattern |
 | 08 | AlfaRomeo_Giulia_QV_2022 | 5-spoke angular | Distinctive angular finish |
 | 09 | RangeRover_Sport_2023 | Split-spoke SUV | Wide, split design |
-| 10 | Tesla_ModelS_Plaid_2022 | Aero turbine | Enclosed aero wheel, unique silhouette |
+| 10 | Tesla_ModelS_Plaid_2022 | Twin 5-spoke turbine | Paired spokes in turbine pattern, dark finish |
 
-> Classes were chosen to maximise visual distinctiveness across spoke count, pattern type, and brand — reducing inter-class similarity and improving classifier performance.
+> Classes were chosen to maximise visual distinctiveness across spoke count, pattern complexity, and design language — reducing inter-class similarity and improving classifier performance.
 
 ---
 
@@ -283,14 +283,27 @@ plt.savefig('confusion_matrix.png', dpi=150)
 
 > Save all plots as `.png` at 150 dpi minimum — good enough for the report.
 
+### Confusion matrix discussion points (write this in the report)
+
+**ResNet18 (93.3%):**
+- 8 out of 10 classes classified perfectly (3/3)
+- Ferrari_SF90: 2/3 correct — 1 misclassified as Tesla_ModelS. Both have dark 5-spoke designs; at 224×224 resolution the structural differences between the sculpted Ferrari spoke and Tesla's twin-spoke turbine become subtle
+- Lambo_Urus: 2/3 correct — 1 misclassified as Tesla_ModelS. The Y-spoke and twin turbine share angular dark-finish geometry
+- With only 3 test images per class, a single misclassification moves per-class accuracy by 33% — this granularity is inherent to the small test set
+
+**EfficientNet-B0 (80.0%):**
+- 6 errors across 4 classes. Porsche_911 at 0% (all 3 test images misclassified: 2→Audi_RS6, 1→Lambo_Urus)
+- EfficientNet's compound scaling may be less effective on very small datasets — the model's depth is harder to fine-tune with only 100 training images
+- Confirms ResNet18 as the better architecture for this problem
+
 ### Model comparison table (put this in the report)
 
-| Model | Test Accuracy | Training time | Parameters | Final choice |
-|-------|-------------|--------------|------------|-------------|
-| ResNet18 | TBD | TBD | 11M | TBD |
-| EfficientNet-B0 | TBD | TBD | 5.3M | TBD |
+| Model | Test Accuracy | Parameters | Layers unfrozen (Phase 2) | Final choice |
+|-------|-------------|------------|--------------------------|-------------|
+| ResNet18 | 93.3% (28/30) | 11.2M | layer4 + FC (~3M trainable) | **Selected** |
+| EfficientNet-B0 | 80.0% (24/30) | 5.3M | features[7,8] + classifier | — |
 
-Fill in after running both models. Final choice to be justified based on test accuracy, training stability, and model complexity. Do not pre-decide — let the results determine the winner.
+**Final choice: ResNet18.** Despite having more total parameters, ResNet18 achieved 13.3 percentage points higher test accuracy and more stable training (smoother convergence, less val accuracy noise). The two-phase fine-tuning strategy was more effective with ResNet18's residual architecture on this small dataset.
 
 ---
 
@@ -347,7 +360,21 @@ The brief awards marks for a short industrial reflection. Include this at the en
 
 ---
 
-## 9. Report Writing Guide (Task 1 — 8 pages)
+## 9. Report Writing Guide
+
+### Full report structure (required by brief)
+
+| Section | Page limit | Notes |
+|---------|-----------|-------|
+| Cover page | 1 | Title, team number, names, student numbers, emails, date |
+| Executive summary | ~0.5 | Brief overview of both tasks — write last |
+| **Task 1: Image Classification** | **8 pages** | See breakdown below |
+| Task 2: Automation Process | 12 pages | Separate plan |
+| Conclusion | ~1 | Limitations, recommendations, future work |
+| Teamwork | ~0.5 | How tasks were split among team members |
+| References | separate pages | IEEE citation style — does NOT count toward page limits |
+
+### Task 1 subsection breakdown (8 pages)
 
 | Subsection | Approx pages | Key content |
 |-----------|-------------|------------|
@@ -355,9 +382,18 @@ The brief awards marks for a short industrial reflection. Include this at the en
 | Model architecture | 1.5 | Why transfer learning, why ResNet18, architecture diagram or description, two-phase fine-tuning strategy |
 | Training procedure | 1.5 | Hyperparameters table, augmentation justification, overfitting mitigation techniques, LR scheduler |
 | Results & evaluation | 2.5 | Accuracy, confusion matrix with discussion, training curves, model comparison table, which classes are confused and why |
-| Industrial reflection | 0.5 | Deployment assumptions, failure modes, domain gap |
+| Industrial reflection | 1 | Deployment assumptions, failure modes, domain gap |
 
-> Stay within 8 pages. Cut prose, keep tables and figures — they communicate more per page.
+### Formatting requirements (from brief)
+
+- Font: **11pt**, Calibri or Arial
+- Line spacing: **single** or multiple 1.1
+- Text: **justified** (both left and right aligned)
+- All figures must have **captions, axis labels, and legends**
+- Curves must be **distinguishable in black and white** (already done — using solid vs dashed)
+- References: **IEEE citation style** on separate pages
+
+> Stay within 8 pages for Task 1. Cut prose, keep tables and figures — they communicate more per page.
 
 ---
 
@@ -385,4 +421,4 @@ The brief awards marks for a short industrial reflection. Include this at the en
 
 ---
 
-*ELEC0145 Assignment 2 | Task 1 Plan | Last updated: 9 March 2026*
+*ELEC0145 Assignment 2 | Task 1 Plan | Last updated: 15 March 2026*

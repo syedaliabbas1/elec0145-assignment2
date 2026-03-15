@@ -68,7 +68,7 @@ dataset/
 │   ├── 01_BMW_M3_2023/
 │   ├── 02_Porsche_911_2024/
 │   ├── ...
-│   └── 10_RangeRover_Sport_2023/
+│   └── 10_Tesla_ModelS_Plaid_2022/
 ├── val/
 │   ├── 01_BMW_M3_2023/
 │   └── ...
@@ -89,15 +89,17 @@ dataset/
 
 ## 3. Data Split Strategy
 
-| Split | Proportion | Count | Purpose |
-|-------|-----------|-------|---------|
-| Train | 70% | 105 images | Model learning |
-| Validation | 15% | 22 images | Hyperparameter tuning, early stopping |
-| Test | 15% | 23 images | Final unbiased performance evaluation |
+| Split | Proportion | Per class | Total | Purpose |
+|-------|-----------|-----------|-------|---------|
+| Train | ~67% | 10 images | 100 images | Model learning |
+| Validation | ~13% | 2 images | 20 images | Hyperparameter tuning, early stopping |
+| Test | ~20% | 3 images | 30 images | Final unbiased performance evaluation |
+
+> **The split is stratified per class** — 10/2/3 images are drawn from each class independently, ensuring every class is represented in every split. This is essential for the confusion matrix to be meaningful.
 
 ### Justification (write this in the report)
 
-The dataset is small (150 images), so the split must balance having enough training data against having a meaningful test set. A 70/15/15 split gives 105 training images — sufficient for fine-tuning a pretrained model — while the held-out test set remains completely unseen until final evaluation, ensuring unbiased results. Cross-validation was considered but ruled out as the additional computational cost is unnecessary given that transfer learning significantly reduces overfitting risk on small datasets.
+The dataset is small (150 images), so the split must balance having enough training data against having a meaningful test set. A stratified 10/2/3 split per class (100/20/30 total) ensures every class is represented in validation and test — without stratification, random sampling could leave some classes entirely absent from a split, making evaluation unreliable. The test set remains completely unseen until final evaluation, ensuring unbiased results. Cross-validation was considered but ruled out as the additional computational cost is unnecessary given that transfer learning significantly reduces overfitting risk on small datasets.
 
 > **Important:** Perform the split **before** any training. The test set must never influence any training or tuning decision.
 
@@ -275,10 +277,10 @@ plt.savefig('confusion_matrix.png', dpi=150)
 
 | Model | Test Accuracy | Training time | Parameters | Final choice |
 |-------|-------------|--------------|------------|-------------|
-| ResNet18 | TBD | TBD | 11M | ✅ Yes |
-| EfficientNet-B0 | TBD | TBD | 5.3M | ❌ No |
+| ResNet18 | TBD | TBD | 11M | TBD |
+| EfficientNet-B0 | TBD | TBD | 5.3M | TBD |
 
-Fill in after running both models. Justify the final choice based on accuracy, training stability, and complexity.
+Fill in after running both models. Final choice to be justified based on test accuracy, training stability, and model complexity. Do not pre-decide — let the results determine the winner.
 
 ---
 

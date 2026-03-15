@@ -23,14 +23,14 @@
 |----------|-------|-----------|------------|
 | 01 | BMW_M3_2023 | 5-double-spoke | Iconic, highly distinctive |
 | 02 | Porsche_911_2024 | Centre-lock turbine | Very different from others |
-| 03 | Mercedes_AMG_GT_2023 | Multi-spoke turbine | Dense spoke pattern |
+| 03 | Mercedes_AMG_C63_2023 | Multi-spoke cross | Aggressive multi-spoke pattern |
 | 04 | Audi_RS6_2023 | 5-V-spoke | Bold V shape |
-| 05 | Ferrari_SF90_2023 | Mesh / diamond-cut | Fine mesh, unique texture |
-| 06 | Ford_Mustang_GT500_2020 | 10-spoke | High spoke count |
+| 05 | Ferrari_SF90_2022 | Mesh / diamond-cut | Fine mesh, unique texture |
+| 06 | Mercedes_Maybach_S580_2022 | 5-spoke luxury | Polished multi-spoke, wide design |
 | 07 | Lamborghini_Urus_2022 | Y-spoke | Aggressive Y pattern |
-| 08 | Honda_CivicTypeR_2023 | Sharp multi-spoke | Angular, distinctive finish |
-| 09 | Toyota_GR_Yaris_2022 | Simple 5-spoke | Plain contrast to complex ones |
-| 10 | RangeRover_Sport_2023 | Split-spoke SUV | Wide, split design |
+| 08 | AlfaRomeo_Giulia_QV_2022 | 5-spoke angular | Distinctive angular finish |
+| 09 | RangeRover_Sport_2023 | Split-spoke SUV | Wide, split design |
+| 10 | Tesla_ModelS_Plaid_2022 | Aero turbine | Enclosed aero wheel, unique silhouette |
 
 > Classes were chosen to maximise visual distinctiveness across spoke count, pattern type, and brand — reducing inter-class similarity and improving classifier performance.
 
@@ -255,9 +255,9 @@ import numpy as np
 
 # After evaluating on test set:
 cm = confusion_matrix(all_labels, all_predictions)
-class_names = ['BMW_M3', 'Porsche_911', 'Mercedes_AMG', 'Audi_RS6',
-               'Ferrari_SF90', 'Ford_Mustang', 'Lambo_Urus',
-               'Honda_CTR', 'Toyota_GRY', 'RangeRover']
+class_names = ['BMW_M3', 'Porsche_911', 'Mercedes_AMG_C63', 'Audi_RS6',
+               'Ferrari_SF90', 'Maybach_S580', 'Lambo_Urus',
+               'AlfaRomeo_Giulia', 'RangeRover', 'Tesla_ModelS']
 
 plt.figure(figsize=(10, 8))
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
@@ -276,7 +276,7 @@ plt.savefig('confusion_matrix.png', dpi=150)
 | Model | Test Accuracy | Training time | Parameters | Final choice |
 |-------|-------------|--------------|------------|-------------|
 | ResNet18 | TBD | TBD | 11M | ✅ Yes |
-| EfficientNetB0 | TBD | TBD | 5.3M | ❌ No |
+| EfficientNet-B0 | TBD | TBD | 5.3M | ❌ No |
 
 Fill in after running both models. Justify the final choice based on accuracy, training stability, and complexity.
 

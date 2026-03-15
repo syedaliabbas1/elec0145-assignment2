@@ -7,9 +7,9 @@ classes = [
     "03_Mercedes_AMG_C63_2023",
     "04_Audi_RS6_2023",
     "05_Ferrari_SF90_2022",
-    "06_Ford_Mustang_GT500_2020",
+    "06_Mercedes_Maybach_S580_2022",
     "07_Lamborghini_Urus_2022",
-    "08_Honda_CivicTypeR_2023",
+    "08_AlfaRomeo_Giulia_QV_2022",
     "09_RangeRover_Sport_2023",
     "10_Tesla_ModelS_Plaid_2022"
 ]
